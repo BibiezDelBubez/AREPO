@@ -1,0 +1,171 @@
+/* AREPO Odoo / Material Design System QSS Stylesheet */
+
+QMainWindow {
+    background-color: #F4F5F7;
+    font-family: 'Segoe UI', 'Inter', sans-serif;
+}
+
+/* Side Navigation Drawer */
+#SidebarDrawer {
+    background-color: #2C3E50;
+    border: none;
+    min-width: 220px;
+    max-width: 220px;
+}
+
+#SidebarHeader {
+    background-color: #1A252F;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 18px 12px;
+}
+
+#SidebarButton {
+    background-color: transparent;
+    color: #ECF0F1;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 4px;
+    margin: 2px 8px;
+}
+
+#SidebarButton:hover {
+    background-color: #34495E;
+    color: #FFFFFF;
+}
+
+#SidebarButton:checked {
+    background-color: #714B67;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+/* Top Bar */
+#TopBar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E0E2E6;
+    min-height: 50px;
+    max-height: 50px;
+    padding: 0 16px;
+}
+
+#BreadcrumbLabel {
+    color: #2C3E50;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Odoo Card Container */
+QFrame#OdooCard {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E2E6;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+/* Section Headings */
+QLabel.CardTitle {
+    color: #2C3E50;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+QLabel.Subtitle {
+    color: #7F8C8D;
+    font-size: 12px;
+}
+
+/* Buttons */
+QPushButton.PrimaryAction {
+    background-color: #017E84;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 8px 16px;
+    border: none;
+}
+
+QPushButton.PrimaryAction:hover {
+    background-color: #016266;
+}
+
+QPushButton.PrimaryAction:pressed {
+    background-color: #014649;
+}
+
+QPushButton.SecondaryAction {
+    background-color: #E8F4F4;
+    color: #017E84;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 8px 16px;
+    border: 1px solid #017E84;
+}
+
+QPushButton.SecondaryAction:hover {
+    background-color: #D1EBEB;
+}
+
+/* Input Fields & Combo Boxes */
+QLineEdit, QComboBox, QSpinBox, QTextEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #C4C8D0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #2C3E50;
+}
+
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QTextEdit:focus {
+    border: 2px solid #017E84;
+}
+
+/* Tables & Lists */
+QTableWidget, QTreeWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E2E6;
+    border-radius: 6px;
+    gridline-color: #F0F1F3;
+    font-size: 12px;
+}
+
+QHeaderView::section {
+    background-color: #F8F9FA;
+    color: #2C3E50;
+    font-weight: bold;
+    padding: 6px;
+    border: none;
+    border-bottom: 2px solid #E0E2E6;
+}
+
+/* Status Badges */
+QLabel.BadgeGold {
+    background-color: #FEF3D6;
+    color: #B7791F;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+QLabel.BadgeGreen {
+    background-color: #DEF7EC;
+    color: #03543F;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+QLabel.BadgeRed {
+    background-color: #FDE8E8;
+    color: #9B1C1C;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 4px 8px;
+}

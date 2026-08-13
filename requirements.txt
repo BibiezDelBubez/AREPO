@@ -1,0 +1,6 @@
+PySide6>=6.6.0
+sqlalchemy>=2.0.0
+spacy>=3.7.0
+reportlab>=4.0.0
+pandas>=2.0.0
+pillow>=10.0.0
