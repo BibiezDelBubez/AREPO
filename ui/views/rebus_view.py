@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QLabel, QLineEdit,
     QPushButton, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox,
     QTableWidget, QTableWidgetItem, QFileDialog, QHeaderView, QMessageBox,
-    QProgressBar, QTextEdit, QGroupBox
+    QProgressBar, QTextEdit, QGroupBox, QApplication
 )
 from PySide6.QtCore import Qt, QThread, Signal
 from ui.components.odoo_card import OdooCard
@@ -75,7 +75,7 @@ class RebusView(QWidget):
         self._build_anarebus_tab()
         self._build_stereorebus_tab()
 
-    # --- Sub-tab 1: NLP Extractor (Full Richness from Indovinista) ---
+    # --- Sub-tab 1: NLP Extractor ---
     def _build_nlp_tab(self) -> None:
         nlp_widget = QWidget()
         layout = QVBoxLayout(nlp_widget)
@@ -103,7 +103,6 @@ class RebusView(QWidget):
         h_files.addStretch()
         ctrl_card.add_layout(h_files)
 
-        # Parameters Box 1: Words & Letters
         h_p1 = QHBoxLayout()
         h_p1.addWidget(QLabel("Min Parole:"))
         self.spin_min_w = QSpinBox()
@@ -131,7 +130,6 @@ class RebusView(QWidget):
 
         ctrl_card.add_layout(h_p1)
 
-        # Parameters Box 2: Sweet Spot & Filters
         h_p2 = QHBoxLayout()
         h_p2.addWidget(QLabel("Sweet Spot Min:"))
         self.spin_sweet_min = QSpinBox()
@@ -162,7 +160,6 @@ class RebusView(QWidget):
 
         ctrl_card.add_layout(h_p2)
 
-        # Scan Buttons
         h_scan = QHBoxLayout()
         self.btn_start_scan = QPushButton("🚀 Avvia Scansione NLP")
         self.btn_start_scan.setProperty("class", "PrimaryAction")
@@ -179,7 +176,6 @@ class RebusView(QWidget):
         ctrl_card.add_layout(h_scan)
         layout.addWidget(ctrl_card)
 
-        # Progress Bar & Status
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.hide()
@@ -188,13 +184,11 @@ class RebusView(QWidget):
         self.lbl_status = QLabel("")
         layout.addWidget(self.lbl_status)
 
-        # Results Table
         self.nlp_table = QTableWidget(0, 8)
         self.nlp_table.setHorizontalHeaderLabels(["Sintagma", "Parole", "Lettere", "Sweet Spot", "Score", "Fonte", "Riga", "Contesto"])
         self.nlp_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         layout.addWidget(self.nlp_table)
 
-        # Export Buttons
         export_layout = QHBoxLayout()
         self.btn_export_csv = QPushButton("Esporta CSV (Excel BOM)")
         self.btn_export_csv.setProperty("class", "SecondaryAction")
@@ -312,7 +306,7 @@ class RebusView(QWidget):
             DataExporter.export_to_json(self.nlp_results, path)
             QMessageBox.information(self, "Successo", f"Risultati esportati in: {path}")
 
-    # --- Sub-tab 2: Anarebus & Regole d'Oro (Full Richness from Indovinista) ---
+    # --- Sub-tab 2: Anarebus & Regole d'Oro ---
     def _build_anarebus_tab(self) -> None:
         anarebus_widget = QWidget()
         layout = QVBoxLayout(anarebus_widget)
@@ -340,11 +334,9 @@ class RebusView(QWidget):
         input_card.add_layout(grid_inputs)
         layout.addWidget(input_card)
 
-        # Letter Difference Assistant Widget
         self.letter_diff_widget = LetterDiffWidget()
         layout.addWidget(self.letter_diff_widget)
 
-        # Evaluation Output Card
         self.eval_card = OdooCard(title="🏆 Esito Valutazione Regole d'Oro")
         self.lbl_eval_score = QLabel("Punteggio Qualità: -")
         self.lbl_eval_score.setStyleSheet("font-size: 16px; font-weight: bold; color: #017E84;")
@@ -360,7 +352,6 @@ class RebusView(QWidget):
         self.eval_card.add_widget(self.lbl_eval_grammar)
         layout.addWidget(self.eval_card)
 
-        # Parametric Generator Box
         gen_card = OdooCard(title="⚡ Generatore & Solutore Parametrico")
         h_gen_params = QHBoxLayout()
 
@@ -396,7 +387,6 @@ class RebusView(QWidget):
         gen_card.add_layout(btn_layout)
         layout.addWidget(gen_card)
 
-        # Action Results Table
         self.anarebus_table = QTableWidget(0, 4)
         self.anarebus_table.setHorizontalHeaderLabels(["Chiavi", "Soluzione", "Score", "Badge / Rimescolamento"])
         self.anarebus_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -452,7 +442,7 @@ class RebusView(QWidget):
             self.anarebus_table.setItem(r, 2, QTableWidgetItem(str(res["score"])))
             self.anarebus_table.setItem(r, 3, QTableWidgetItem(res["badge"]))
 
-    # --- Sub-tab 3: Rebus Stereoscopici (Motore Linguistico AI) ---
+    # --- Sub-tab 3: Motore Stereorebus (Rebus Stereoscopici Linguistici) ---
     def _build_stereorebus_tab(self) -> None:
         stereo_widget = QWidget()
         layout = QVBoxLayout(stereo_widget)
@@ -462,13 +452,14 @@ class RebusView(QWidget):
             subtitle="Progetta la struttura linguistica differenziale di uno stereorebus basata su verbi al passato/futuro (3ª persona) e soggetti visivi."
         )
 
-        # Mode A: Top-Down (Soluzione -> Prima Lettura)
+        # Mode A: Top-Down Generator (Seconda Lettura -> Prima Lettura A/B)
         grp_topdown = QGroupBox("Modalità A: Generazione da Seconda Lettura (Top-Down)")
         v_topdown = QVBoxLayout(grp_topdown)
         h_td = QHBoxLayout()
         h_td.addWidget(QLabel("Frase Risolutiva / Seconda Lettura:"))
         self.txt_stereo_sol = QLineEdit()
         self.txt_stereo_sol.setPlaceholderText("Es: UN INTENSA EMOZIONE")
+        self.txt_stereo_sol.returnPressed.connect(self._generate_stereorebus_topdown)
         h_td.addWidget(self.txt_stereo_sol)
 
         btn_gen_stereo = QPushButton("⚡ Genera Combinazioni Stereorebus")
@@ -478,38 +469,60 @@ class RebusView(QWidget):
         v_topdown.addLayout(h_td)
         card.add_widget(grp_topdown)
 
-        # Mode B: Bottom-Up (Vignetta A / Vignetta B -> Soluzione)
+        # Mode B: Bottom-Up Differential Analyzer (Vignetta A + Vignetta B -> Soluzione)
         grp_bottomup = QGroupBox("Modalità B: Analizzatore Differenziale (Bottom-Up)")
         v_bottomup = QVBoxLayout(grp_bottomup)
-        h_bu = QHBoxLayout()
-        h_bu.addWidget(QLabel("Vignetta A (Soggetti/Stato):"))
+        h_bu1 = QHBoxLayout()
+        h_bu1.addWidget(QLabel("Vignetta A (Soggetto/Stato Iniziale):"))
         self.txt_vignette_a = QLineEdit()
         self.txt_vignette_a.setPlaceholderText("Es: PINO CASSA")
-        h_bu.addWidget(self.txt_vignette_a)
+        h_bu1.addWidget(self.txt_vignette_a)
 
-        h_bu.addWidget(QLabel("Vignetta B (Cambiamento/Azione):"))
+        h_bu1.addWidget(QLabel("Vignetta B (Azione / Cambio di Stato):"))
         self.txt_vignette_b = QLineEdit()
         self.txt_vignette_b.setPlaceholderText("Es: RECISO SVUOTATA")
-        h_bu.addWidget(self.txt_vignette_b)
+        h_bu1.addWidget(self.txt_vignette_b)
+        v_bottomup.addLayout(h_bu1)
+
+        h_bu2 = QHBoxLayout()
+        h_bu2.addWidget(QLabel("Grafemi Opzionali (es: U N):"))
+        self.txt_stereo_grafemi = QLineEdit()
+        self.txt_stereo_grafemi.setPlaceholderText("Es: U N")
+        h_bu2.addWidget(self.txt_stereo_grafemi)
 
         btn_analyze_stereo = QPushButton("🔍 Analizza Differenza & Risolvi")
-        btn_analyze_stereo.setProperty("class", "SecondaryAction")
+        btn_analyze_stereo.setProperty("class", "PrimaryAction")
         btn_analyze_stereo.clicked.connect(self._analyze_stereorebus_bottomup)
-        h_bu.addWidget(btn_analyze_stereo)
-        v_bottomup.addLayout(h_bu)
+        h_bu2.addWidget(btn_analyze_stereo)
+        v_bottomup.addLayout(h_bu2)
+
         card.add_widget(grp_bottomup)
+
+        # Mode C: LLM Prompt Generator
+        grp_llm = QGroupBox("Modalità C: Generatore System Prompt per LLM / AI (ChatGPT / Gemini)")
+        v_llm = QVBoxLayout(grp_llm)
+        h_llm = QHBoxLayout()
+        btn_copy_prompt = QPushButton("📋 Copia System Prompt LLM per Stereorebus")
+        btn_copy_prompt.setProperty("class", "SecondaryAction")
+        btn_copy_prompt.clicked.connect(self._copy_llm_prompt)
+        h_llm.addWidget(btn_copy_prompt)
+        h_llm.addStretch()
+        v_llm.addLayout(h_llm)
+        card.add_widget(grp_llm)
 
         layout.addWidget(card)
 
         # Results Table for Stereorebus
-        self.stereo_table = QTableWidget(0, 6)
+        self.stereo_table = QTableWidget(0, 8)
         self.stereo_table.setHorizontalHeaderLabels([
             "Prima Lettura (Grafemi + Soggetto + Verbo 3ª pers)",
-            "Seconda Lettura",
-            "Verbo Azione (Passato/Futuro)",
+            "Vignetta A (Scena I)",
+            "Vignetta B (Scena II - Azione)",
+            "Seconda Lettura (Soluzione)",
+            "Tempo Verbale",
             "Lettere",
             "Punteggio Qualità (0-100)",
-            "Stato / Coerenza"
+            "Dettagli Valutazione"
         ])
         self.stereo_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         layout.addWidget(self.stereo_table)
@@ -528,19 +541,32 @@ class RebusView(QWidget):
     def _analyze_stereorebus_bottomup(self) -> None:
         va = self.txt_vignette_a.text().strip()
         vb = self.txt_vignette_b.text().strip()
+        graf = self.txt_stereo_grafemi.text().strip()
         if not va or not vb:
             QMessageBox.warning(self, "Attenzione", "Inserisci gli elementi di Vignetta A e Vignetta B!")
             return
 
-        candidates = self.stereorebus_engine.analyze_differential_states(va, vb)
+        candidates = self.stereorebus_engine.analyze_differential_states(va, vb, grafemi=graf)
         self._display_stereorebus_results(candidates)
 
     def _display_stereorebus_results(self, candidates: list) -> None:
         self.stereo_table.setRowCount(len(candidates))
         for r, cand in enumerate(candidates):
             self.stereo_table.setItem(r, 0, QTableWidgetItem(cand.keys_text))
-            self.stereo_table.setItem(r, 1, QTableWidgetItem(cand.solution_text))
-            self.stereo_table.setItem(r, 2, QTableWidgetItem(cand.action_verb))
-            self.stereo_table.setItem(r, 3, QTableWidgetItem(str(cand.total_letters)))
-            self.stereo_table.setItem(r, 4, QTableWidgetItem(f"{cand.score} / 100"))
-            self.stereo_table.setItem(r, 5, QTableWidgetItem(cand.badge))
+            self.stereo_table.setItem(r, 1, QTableWidgetItem(cand.vignette_a_desc))
+            self.stereo_table.setItem(r, 2, QTableWidgetItem(cand.vignette_b_desc))
+            self.stereo_table.setItem(r, 3, QTableWidgetItem(cand.solution_text))
+            self.stereo_table.setItem(r, 4, QTableWidgetItem(cand.verb_tense))
+            self.stereo_table.setItem(r, 5, QTableWidgetItem(str(cand.total_letters)))
+            self.stereo_table.setItem(r, 6, QTableWidgetItem(f"{cand.overall_score} / 100"))
+            self.stereo_table.setItem(r, 7, QTableWidgetItem(cand.explanation))
+
+    def _copy_llm_prompt(self) -> None:
+        prompt_text = StereorebusEngine.get_llm_system_prompt()
+        QApplication.clipboard().setText(prompt_text)
+        QMessageBox.information(
+            self,
+            "System Prompt Copiato",
+            "Il System Prompt strutturato per Stereorebus è stato copiato negli appunti!\n"
+            "Puoi incollarlo su ChatGPT, Gemini o Claude per generare o affinare idee di rebus stereoscopici."
+        )
